@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <report-views version="2.0" >
  <header>
-  <DateModified>2018-11-27T17:13:12</DateModified>
+  <DateModified>2018-11-27T19:06:12</DateModified>
   <ModuleName>Brazo</ModuleName>
-  <SummaryTimeStamp>Unknown</SummaryTimeStamp>
+  <SummaryTimeStamp>2018-11-27T18:01:49</SummaryTimeStamp>
   <SavedFilePath>C:/Users/berna/OneDrive/Documentos/Xilinx Projects/Brazo_RDI/iseconfig/Brazo.xreport</SavedFilePath>
-  <ImplementationReportsDirectory>C:/Users/berna/OneDrive/Documentos/Xilinx Projects/Brazo_RDI</ImplementationReportsDirectory>
+  <ImplementationReportsDirectory>C:/Users/berna/OneDrive/Documentos/Xilinx Projects/Brazo_RDI\</ImplementationReportsDirectory>
   <DateInitialized>2018-11-27T17:13:12</DateInitialized>
   <EnableMessageFiltering>false</EnableMessageFiltering>
  </header>

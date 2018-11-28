@@ -17,8 +17,8 @@ use IEEE.NUMERIC_STD.ALL;
 --  duty(pulses) = duty(us)/0.02(us)
 
 --Experimentalmente se han comprobado que:
---     0Â° se generan con un duty de  548 us
---   180Â° se generan con un duty de 2360 us
+--     0° se generan con un duty de  548 us
+--   180° se generan con un duty de 2360 us
 
 entity PWM_Gen is
    port( duty      : in STD_LOGIC_VECTOR(19 downto 0); -- duty cycle del PWM (Spartan pulses) = duty(us)/0.02(us)
@@ -42,7 +42,7 @@ begin
    begin
 
       if rising_edge(clk_50MHz) then
-         if cont = period - '1' then
+         if cont = PWMperiod - '1' then
             cont <= (others => '0');
          else
             cont <= cont + 1;

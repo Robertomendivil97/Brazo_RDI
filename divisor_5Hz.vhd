@@ -13,7 +13,7 @@ begin
 	process (clk_50MHz)
 	begin
 		if rising_edge(clk_50MHz) then
-   		if (counter = 5000000) then
+   		if (counter = 2500000) then --5000000) then
          	aux <= NOT aux;
             counter  <= 0;
          else
