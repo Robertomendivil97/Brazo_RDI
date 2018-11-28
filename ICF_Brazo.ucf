@@ -16,11 +16,11 @@ NET "servos(5)" LOC = "D8";
 #Botones para control
 NET "btn_inc" LOC = "M13";
 NET "btn_dec" LOC = "M14";
-NET "btn_save" LOC = "L13";
-NET "btn_play" LOC = "L14";
+#NET "btn_save" LOC = "L13";
+#NET "btn_play" LOC = "L14";
 
 #Switches para control
-NET "btn_reset" LOC = "K13";
+#NET "btn_reset" LOC = "K13";
 
 #Clock interno de la tarjeta
 NET "clk_50MHz" LOC = "T9";

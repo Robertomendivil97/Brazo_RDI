@@ -16,28 +16,46 @@ architecture Behavioral of Brazo is
    --Componente para generar señales PWM para cada motor
 	component PWM_Gen is
 		port( duty      : in STD_LOGIC_VECTOR(19 downto 0); -- duty cycle del PWM (Spartan pulses) = duty(us)/0.02(us)
-			  clk_50MHz : in STD_LOGIC;                     -- reloj de 50MHz
-			  pwm       : out STD_LOGIC );                  -- señal con PWM generado
+			   clk_50MHz : in STD_LOGIC;                     -- reloj de 50MHz
+			   pwm       : out STD_LOGIC );                  -- señal con PWM generado
 	 end component;
 
 	--Divisores para generar relojes auxiliares
-	component divisor_5Hz is
+	component divisor_10Hz is
 		port( clk_50MHz : in  STD_LOGIC;
-   			clk_5Hz   : out STD_LOGIC );
-	end component;
-	
-	--Señales para guardar la posici�n actual de cada uno de los servos
+   			clk_10Hz   : out STD_LOGIC );
+   end component;
+   
+   --Componente OneShot para ignorar el ruido de los botones
+   component OneShot is
+      port( E  : IN STD_LOGIC;
+            clk : IN STD_LOGIC;
+            S : OUT STD_LOGIC );
+   end component;
+   
+   --Límite de duty para cada uno de los servos (para revisar que no los superen)
+   constant maxS1 : STD_LOGIC_VECTOR(19 downto 0) := "00011111010000000000"; --128000 Spartan pulses o 2360 us
+   constant maxS2 : STD_LOGIC_VECTOR(19 downto 0) := "00011111010000000000"; --128000 Spartan pulses o 2360 us
+   constant maxS3 : STD_LOGIC_VECTOR(19 downto 0) := "00011111010000000000"; --128000 Spartan pulses o 2360 us
+   constant maxS4 : STD_LOGIC_VECTOR(19 downto 0) := "00011111010000000000"; --128000 Spartan pulses o 2360 us
+   constant maxS5 : STD_LOGIC_VECTOR(19 downto 0) := "00011111010000000000"; --128000 Spartan pulses o 2360 us
+
+   constant maxS1 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000";
+   constant maxS2 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000";
+   constant maxS3 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000";
+   constant maxS4 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000";
+   constant maxS5 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000";
+   
+
+	--Señales para guardar la posici�n actual de cada uno de los servos (en pulsos de la Spartan)
 	signal dutyS1 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000";
 	signal dutyS2 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000";
 	signal dutyS3 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000";
 	signal dutyS4 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000";
 	signal dutyS5 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000";
-	
-	--Señales para validar que los servos no excedan su capacidad
-	signal min, max : STD_LOGIC;
 
 	--Señales de relojes auxiliares
-   signal clk_5Hz : STD_LOGIC;
+   signal clk_10Hz : STD_LOGIC;
    
 begin
 
@@ -46,40 +64,25 @@ begin
 	Servo2 : PWM_Gen port map (dutyS2, clk_50MHz, servos(2));
 	Servo3 : PWM_Gen port map (dutyS3, clk_50MHz, servos(3));
 	Servo4 : PWM_Gen port map (dutyS4, clk_50MHz, servos(4));
-	Servo5 : PWM_Gen port map (dutyS5, clk_50MHz, servos(5));
-	
-	--Max = '1' cuando alguno de los motores seleccionados ha llegado al m�ximo (2360 us = 128000 Spartan pulses)
-	max <= '1' when ( (dutyS1 > "00011111010000000000") and (servoSelect(1) = '1') ) or
-						 ( (dutyS2 > "00011111010000000000") and (servoSelect(2) = '1') ) or
-						 ( (dutyS3 > "00011111010000000000") and (servoSelect(3) = '1') ) or
-						 ( (dutyS4 > "00011111010000000000") and (servoSelect(4) = '1') ) or
-						 ( (dutyS5 > "00011111010000000000") and (servoSelect(5) = '1') )
-				 else '0';
-	--Min = '1' cuando alguno de los motores seleccionados ha llegado al m�nimo (548 us = 27400 Spartan pulses)
-	min <= '1' when ( (dutyS1 < "00000110101100001000") and (servoSelect(1) = '1') ) or
-						 ( (dutyS2 < "00000110101100001000") and (servoSelect(2) = '1') ) or
-						 ( (dutyS3 < "00000110101100001000") and (servoSelect(3) = '1') ) or
-						 ( (dutyS4 < "00000110101100001000") and (servoSelect(4) = '1') ) or
-						 ( (dutyS5 < "00000110101100001000") and (servoSelect(5) = '1') )
-				  else '0';
-				  
+   Servo5 : PWM_Gen port map (dutyS5, clk_50MHz, servos(5));
+   
 	--Generar relojes auxiliares
-	clk5Hz: divisor_5Hz port map (clk_50MHz, clk_5Hz);
+	clk10Hz: divisor_10Hz port map (clk_50MHz, clk_10Hz);
 	
-	process(clk_5Hz) begin
-		if rising_edge(clk_5Hz) then
+	process(clk_10Hz) begin
+		if rising_edge(clk_10Hz) then
 			if (btn_inc = '1') then
-				 dutyS1 <= dutyS1 + "00000000001000101110"; --"00011111010000000000";--128000;
-				 dutyS2 <= dutyS2 + "00000000001000101110"; --"00011111010000000000";--128000;
-				 dutyS3 <= dutyS3 + "00000000001000101110"; --"00011111010000000000";--128000;
-				 dutyS4 <= dutyS4 + "00000000001000101110"; --"00011111010000000000";--128000;
-				 dutyS5 <= dutyS5 + "00000000001000101110"; --"00011111010000000000";--128000;
+				 dutyS1 <= dutyS1 + "00000000001000101110";
+				 dutyS2 <= dutyS2 + "00000000001000101110";
+				 dutyS3 <= dutyS3 + "00000000001000101110";
+				 dutyS4 <= dutyS4 + "00000000001000101110";
+				 dutyS5 <= dutyS5 + "00000000001000101110";
 			elsif (btn_dec = '1') then
-				 dutyS1 <= dutyS1 - "00000000001000101110"; --"00001110111000000101";--60933;
-				 dutyS2 <= dutyS2 - "00000000001000101110"; --"00001110111000000101";--60933;
-				 dutyS3 <= dutyS3 - "00000000001000101110"; --"00001110111000000101";--60933;
-				 dutyS4 <= dutyS4 - "00000000001000101110"; --"00001110111000000101";--60933;
-				 dutyS5 <= dutyS5 - "00000000001000101110"; --"00001110111000000101";--60933;
+				 dutyS1 <= dutyS1 - "00000000001000101110";
+				 dutyS2 <= dutyS2 - "00000000001000101110";
+				 dutyS3 <= dutyS3 - "00000000001000101110";
+				 dutyS4 <= dutyS4 - "00000000001000101110";
+				 dutyS5 <= dutyS5 - "00000000001000101110";
 			end if;
 		end if;
 	end process;
