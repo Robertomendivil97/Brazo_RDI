@@ -6,9 +6,9 @@ entity divisor_10Hz is
    		clk_10Hz : out STD_LOGIC );
 end divisor_10Hz;
  
-architecture Behavioral of divisor_5Hz is
+architecture Behavioral of divisor_10Hz is
     signal aux: STD_LOGIC := '0';
-    signal counter : integer range 0 to 2500000 := 0;
+    signal counter : integer range 0 to 100000 := 0;
 begin
 
 	process (clk_50MHz)
