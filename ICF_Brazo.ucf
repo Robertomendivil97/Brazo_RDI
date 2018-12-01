@@ -1,10 +1,10 @@
 
 #Switches para seleccionar servos
-NET "servoSelect(1)" LOC = "F12";
-NET "servoSelect(2)" LOC = "G12";
-NET "servoSelect(3)" LOC = "H14";
-NET "servoSelect(4)" LOC = "H13";
-NET "servoSelect(5)" LOC = "J14";
+#NET "servoSelect(1)" LOC = "F12";
+#NET "servoSelect(2)" LOC = "G12";
+#NET "servoSelect(3)" LOC = "H14";
+#NET "servoSelect(4)" LOC = "H13";
+#NET "servoSelect(5)" LOC = "J14";
 
 #Salidas de PWM de cada uno de los servos
 NET "servos(1)" LOC = "D5";
@@ -16,11 +16,21 @@ NET "servos(5)" LOC = "D8";
 #Botones para control
 NET "btn_inc" LOC = "M13";
 NET "btn_dec" LOC = "M14";
-#NET "btn_save" LOC = "L13";
-#NET "btn_play" LOC = "L14";
+NET "btn_save" LOC = "L13";
+NET "btn_play" LOC = "L14";
 
 #Switches para control
-#NET "btn_reset" LOC = "K13";
+NET "btn_reset" LOC = "K13";
+
+#LEDs para información
+NET "LEDs(0)" LOC = "K12";
+NET "LEDs(1)" LOC = "P14";
+NET "LEDs(2)" LOC = "L12";
+NET "LEDs(3)" LOC = "N14";
+NET "LEDs(4)" LOC = "P13";
+NET "LEDs(5)" LOC = "N12";
+NET "LEDs(6)" LOC = "P12";
+NET "LEDs(7)" LOC = "P11";
 
 #Clock interno de la tarjeta
 NET "clk_50MHz" LOC = "T9";

@@ -6,8 +6,8 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity Brazo is
 	port ( clk_50MHz : IN STD_LOGIC;
-			 --servoSelect : IN STD_LOGIC_VECTOR(5 downto 1); --Switches que determinan qu� motor est� activado
-          btn_inc, btn_dec : IN STD_LOGIC; --Botones para incrementar o disminuir la rotaci�n de los motores seleccionados
+			 --servoSelect : IN STD_LOGIC_VECTOR(5 downto 1); --Switches que determinan quï¿½ motor estï¿½ activado
+          btn_inc, btn_dec : IN STD_LOGIC; --Botones para incrementar o disminuir la rotaciï¿½n de los motores seleccionados
           btn_save, btn_play, btn_reset : IN STD_LOGIC; --Botones para guardar estado, reproducir rutina y borrar rutina
 			 LEDs : OUT STD_LOGIC_VECTOR(7 downto 0);
 			 servos: OUT STD_LOGIC_VECTOR(5 downto 1) );
@@ -15,17 +15,17 @@ end Brazo;
 
 architecture Behavioral of Brazo is
 
-   --Velocidad de reproducción de rutinas (tiempo de espera entre cada posición)
-   constant delay : integer := 10; --(clk10Hz pulses) = delay(s)*10
-   signal contDelay : integer range 0 to delay := 0; --(clk10Hz pulses)
+   --Velocidad de reproducciÃ³n de rutinas (tiempo de espera entre cada posiciÃ³n)
+   constant delay : integer := 20; --(clk10Hz pulses) = delay(s)*10
+   signal contDelay : integer := 0; --(clk10Hz pulses)
 
    --Componente de memoria para almacenar posiciones de motores para rutinas
-   component memoria16x100 is
+   component memoria16x25 is
       port ( clk_50Hz : IN STD_LOGIC;
-             write : IN STD_LOGIC; --Se�al para escribir en la dirección de memoria apuntada por MAR
-             MAR : IN integer range 0 to 2**4 - 1; --Registro para almacenar la dirección de memoria de la que se leerá o en la que se escribirá
-             MDRin : IN STD_LOGIC_VECTOR(100 downto 1); --Registro que muestra la dirección de memoria apuntada
-				 MDRout : OUT STD_LOGIC_VECTOR(100 downto 1) ); --Registro que muestra la dirección de memoria apuntada
+             write : IN STD_LOGIC; --SeÃ±al para escribir en la direcciÃ³n de memoria apuntada por MAR
+             MAR : IN integer range 0 to 2**4 - 1; --Registro para almacenar la direcciÃ³n de memoria de la que se leerÃ¡ o en la que se escribirÃ¡
+             MDRin : IN STD_LOGIC_VECTOR(100 downto 1); --Registro que muestra la direcciÃ³n de memoria apuntada
+				 MDRout : OUT STD_LOGIC_VECTOR(100 downto 1) ); --Registro que muestra la direcciÃ³n de memoria apuntada
    end component;
 
    --Apuntadores a memoria y control
@@ -37,15 +37,15 @@ architecture Behavioral of Brazo is
    signal endPtr, currPtr : integer range 0 to memSize - 1 := 0;
    signal memoryFull : STD_LOGIC := '0';
 
-   --Estados para la máquina de estados
+   --Estados para la mÃ¡quina de estados
    type state_type is (idle, write1, write2, play, fetch1, fetch2);
    signal state : state_type;
 
-   --Componente para generar señales PWM para cada motor
+   --Componente para generar seÃ±ales PWM para cada motor
 	component PWM_Gen is
 		port( duty      : in STD_LOGIC_VECTOR(19 downto 0); -- duty cycle del PWM (Spartan pulses) = duty(us)/0.02(us)
 			   clk_50MHz : in STD_LOGIC;                     -- reloj de 50MHz
-			   pwm       : out STD_LOGIC );                  -- señal con PWM generado
+			   pwm       : out STD_LOGIC );                  -- seÃ±al con PWM generado
 	 end component;
 
 	--Divisores para generar relojes auxiliares
@@ -64,28 +64,27 @@ architecture Behavioral of Brazo is
    --Botones pasados por OneShot
    signal OS_save, OS_play, OS_reset : STD_LOGIC;
    
-   --Límite de duty para cada uno de los servos (para revisar que no los superen)
-   --constant maxS1 : STD_LOGIC_VECTOR(19 downto 0) := "00011111010000000000"; --128000 Spartan pulses o 2360 us
-   --constant maxS2 : STD_LOGIC_VECTOR(19 downto 0) := "00011111010000000000"; --128000 Spartan pulses o 2360 us
-   --constant maxS3 : STD_LOGIC_VECTOR(19 downto 0) := "00011111010000000000"; --128000 Spartan pulses o 2360 us
-   --constant maxS4 : STD_LOGIC_VECTOR(19 downto 0) := "00011111010000000000"; --128000 Spartan pulses o 2360 us
-   --constant maxS5 : STD_LOGIC_VECTOR(19 downto 0) := "00011111010000000000"; --128000 Spartan pulses o 2360 us
+   --LÃ­mite de duty para cada uno de los servos (para revisar que no los superen)
+   constant maxS1 : STD_LOGIC_VECTOR(19 downto 0) := "00011111010000000000"; --128000 Spartan pulses o 2360 us
+   constant maxS2 : STD_LOGIC_VECTOR(19 downto 0) := "00011111010000000000"; --128000 Spartan pulses o 2360 us
+   constant maxS3 : STD_LOGIC_VECTOR(19 downto 0) := "00011111010000000000"; --128000 Spartan pulses o 2360 us
+   constant maxS4 : STD_LOGIC_VECTOR(19 downto 0) := "00011111010000000000"; --128000 Spartan pulses o 2360 us
+   constant maxS5 : STD_LOGIC_VECTOR(19 downto 0) := "00011111010000000000"; --128000 Spartan pulses o 2360 us
 
-   --constant minS1 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000"; --27400 Spartan pulses o 548 us
-   --constant minS2 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000"; --27400 Spartan pulses o 548 us
-   --constant minS3 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000"; --27400 Spartan pulses o 548 us
-   --constant minS4 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000"; --27400 Spartan pulses o 548 us
-   --constant minS5 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000"; --27400 Spartan pulses o 548 us
+   constant minS1 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000"; --27400 Spartan pulses o 548 us
+   constant minS2 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000"; --27400 Spartan pulses o 548 us
+   constant minS3 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000"; --27400 Spartan pulses o 548 us
+   constant minS4 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000"; --27400 Spartan pulses o 548 us
+   constant minS5 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000"; --27400 Spartan pulses o 548 us
    
-	--Señales para guardar la posici�n actual de cada uno de los servos (en pulsos de la Spartan)
+	--SeÃ±ales para guardar la posiciï¿½n actual de cada uno de los servos (en pulsos de la Spartan)
 	signal dutyS1 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000";
 	signal dutyS2 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000";
 	signal dutyS3 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000";
 	signal dutyS4 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000";
 	signal dutyS5 : STD_LOGIC_VECTOR(19 downto 0) := "00000110101100001000";
-	
 
-	--Señales de relojes auxiliares
+	--SeÃ±ales de relojes auxiliares
    signal clk_10Hz : STD_LOGIC;
    
 begin
@@ -107,7 +106,7 @@ begin
 	Servo4: PWM_Gen port map (dutyS4, clk_50MHz, servos(4));
    Servo5: PWM_Gen port map (dutyS5, clk_50MHz, servos(5));
 
-   --Limpiar señales de botones a traves de OneShots
+   --Limpiar seÃ±ales de botones a traves de OneShots
    OSsave:  OneShot port map (btn_save , clk_10Hz, OS_save );
    OSplay:  OneShot port map (btn_play , clk_10Hz, OS_play );
    OSreset: OneShot port map (btn_reset, clk_10Hz, OS_reset);
@@ -116,7 +115,7 @@ begin
 	clk10Hz: divisor_10Hz port map (clk_50MHz, clk_10Hz);
    
    --Mapeo de memoria
-   Memory: memoria16x100 port map (clk_10Hz, writeMem, MAR, MDRin, MDRout);
+   Memory: memoria16x25 port map (clk_10Hz, writeMem, MAR, MDRin, MDRout);
 
 	process(clk_10Hz) begin
 		if rising_edge(clk_10Hz) then
@@ -124,14 +123,14 @@ begin
 
             when idle =>
                if btn_inc = '1' then
-                  dutyS1 <= dutyS1 + "00000000001000101110"; -- +558
+                  dutyS1 <= "00000110101100001000";--dutyS1 + "00000000001000101110"; -- +558
                   dutyS2 <= "00000110101100001000";--dutyS2 + "00000000001000101110"; -- +558
                   dutyS3 <= "00000110101100001000";--dutyS3 + "00000000001000101110"; -- +558
                   dutyS4 <= "00000110101100001000";--dutyS4 + "00000000001000101110"; -- +558
                   dutyS5 <= "00000110101100001000";--dutyS5 + "00000000001000101110"; -- +558
 						--state <= idle;
                elsif btn_dec = '1' then
-                  dutyS1 <= dutyS1 - "00000000001000101110"; -- -558
+                  dutyS1 <= "00011111010000000000";--dutyS1 - "00000000001000101110"; -- -558
                   dutyS2 <= "00011111010000000000";--dutyS2 - "00000000001000101110"; -- -558
                   dutyS3 <= "00011111010000000000";--dutyS3 - "00000000001000101110"; -- -558
                   dutyS4 <= "00011111010000000000";--dutyS4 - "00000000001000101110"; -- -558
@@ -145,7 +144,7 @@ begin
                   MAR <= endPtr;
                   MDRin <= dutyS1 & dutyS2 & dutyS3 & dutyS4 & dutyS5;
                   state <= write1;
-               elsif OS_play = '1' and  (endPtr > 0) then --or (memoryFull = '1') ) then
+               elsif (OS_play = '1') and ((endPtr > 0) or ((memoryFull = '0') and (endPtr = 0))) then
                   currPtr <= 0;
                   contDelay <= delay;
                   state <= play;
@@ -206,8 +205,6 @@ begin
                null;
 
          end case;
-		else
-			null;
 		end if;
 	end process;
 
