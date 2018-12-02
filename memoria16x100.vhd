@@ -1,17 +1,17 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
-use IEEE.STD_LOGIC_SIGNED.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 --Este componente es una memoria de 16 registros de 25 bits que guarda estados
 --de las posiciones de cada uno de los motores para su posterior reproducci√≥n
 
 entity memoria16x100 is
    port ( clk_10Hz : IN STD_LOGIC;
-          write : IN STD_LOGIC; --Se√±al para escribir en la direcci√≥n de memoria apuntada por MAR
-          MAR : IN integer range 0 to 2**4 - 1; --Registro para almacenar la direcci√≥n de memoria de la que se leer√° o en la que se escribir√°
-          MDRin : IN STD_LOGIC_VECTOR(100 downto 1); --Registro que muestra la direcci√≥n de memoria apuntada
-			 MDRout : OUT STD_LOGIC_VECTOR(100 downto 1) ); --Registro que muestra la direcci√≥n de memoria apuntada
+          memWrite : IN STD_LOGIC; --SeÒal para escribir en la direcciÛn de memoria apuntada por MAR
+          MAR : IN integer range 0 to 2**4 - 1; --Registro para almacenar la direcciÛn de memoria de la que se leer· o en la que se escribir·
+          MDRin : IN STD_LOGIC_VECTOR(100 downto 1); --Registro que muestra la direcciÛn de memoria apuntada
+			 MDRout : OUT STD_LOGIC_VECTOR(100 downto 1) ); --Registro que muestra la direcciÛn de memoria apuntada
 end memoria16x100;
 
 architecture Behavioral of memoria16x100 is
@@ -20,7 +20,7 @@ architecture Behavioral of memoria16x100 is
 begin
 	process(clk_10Hz) begin
 		if rising_edge(clk_10Hz) then
-         if write = '1' then
+         if memWrite = '1' then
             registers(MAR) <= MDRin;
          else
             MDRout <= registers(MAR);

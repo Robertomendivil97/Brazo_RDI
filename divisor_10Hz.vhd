@@ -8,17 +8,17 @@ end divisor_10Hz;
  
 architecture Behavioral of divisor_10Hz is
     signal aux: STD_LOGIC := '0';
-    signal counter : integer range 0 to 100000 := 0;
+    signal counter : integer range 0 to 2500000 := 0;
 begin
 
 	process (clk_50MHz)
 	begin
 		if rising_edge(clk_50MHz) then
-   		if (counter = 2500000) then
+   		if (counter < 2500000) then
+				counter <= counter + 1;
+         else
          	aux <= NOT aux;
             counter  <= 0;
-         else
-         	counter <= counter + 1;
          end if;
       end if;
    end process;
