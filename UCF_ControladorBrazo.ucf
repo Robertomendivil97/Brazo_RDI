@@ -1,0 +1,53 @@
+
+#Switches de la tarjeta Spartan
+#NET "switch(1)" LOC = "F12";
+#NET "switch(2)" LOC = "G12";
+#NET "switch(3)" LOC = "H14";
+#NET "switch(4)" LOC = "H13";
+#NET "switch(5)" LOC = "J14";
+#NET "switch(6)" LOC = "K13";
+
+btn_inc, btn_dec, btn_mtr, btn_modo : in std_logic;	 -- botones para incrementar y decrementar posicion del servo seleccionado
+          state_brazo, state_garra, state_modo : out std_logic; -- senales para controlar el dispositivo esclavo
+			 pwmS1, pwmS2A, pwmS2B,	pwmS3,								 -- senales de PWM para controlar cada uno
+			 pwmS4, pwmS5, pwmS6 : out std_logic;						 --  de los servos
+			 LEDs : out std_logic_vector(7 downto 0) );	
+
+#Salidas de la terminal A2 de la tarjeta Spartan (primera parte)
+NET "pwmS1" LOC = "D5";
+NET "pwmS2A" LOC = "D6";
+NET "pwmS2B" LOC = "E7";
+NET "pwmS3" LOC = "D7";
+NET "pwmS4" LOC = "D8";
+NET "pwmS5" LOC = "D10";
+NET "pwmS6" LOC = "D10";
+
+#Salidas de la terminal A2 de la tarjeta Spartan (segunda parte)
+NET "state_arm(0)" LOC = "B5";
+NET "state_arm(1)" LOC = "B6";
+NET "state_claw(0)" LOC = "A7";
+NET "state_claw(1)" LOC = "A8";
+NET "state_rotate(0)" LOC = "B10";
+NET "state_rotate(1)" LOC = "B11";
+NET "state_rotate(2)" LOC = "A12";
+NET "state_modo(0)" LOC = "E6";
+NET "state_modo(1)" LOC = "C5";
+
+#Botones de la tarjeta Spartan
+NET "btn_inc" LOC = "M13";
+NET "btn_dec" LOC = "M14";
+NET "btn_mtr" LOC = "L13";
+NET "btn_modo" LOC = "L14";
+
+#LEDs de la tarjeta Spartan
+#NET "LEDs(0)" LOC = "K12";
+#NET "LEDs(1)" LOC = "P14";
+#NET "LEDs(2)" LOC = "L12";
+#NET "LEDs(3)" LOC = "N14";
+#NET "LEDs(4)" LOC = "P13";
+#NET "LEDs(5)" LOC = "N12";
+#NET "LEDs(6)" LOC = "P12";
+#NET "LEDs(7)" LOC = "P11";
+
+#Clock interno de la tarjeta Spartan
+NET "clk_50MHz" LOC = "T9";
