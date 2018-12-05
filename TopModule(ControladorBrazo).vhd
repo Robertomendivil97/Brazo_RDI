@@ -18,7 +18,7 @@ entity ControladorBrazo is
 			 state_rotate : out std_logic_vector(2 downto 0) :="000"; -- /
 			 pwmS1, pwmS2A, pwmS2B,	pwmS3,								    -- senales de PWM para controlar cada uno
 			 pwmS4, pwmS5, pwmS6 : out std_logic;						    --  de los servos
-			 LEDs : out std_logic_vector(7 downto 0) );				    -- leds de la Spartan (permiten visualizar estados)
+			 LEDs : out std_logic_vector(7 downto 0) := "00000000");	 -- leds de la Spartan (permiten visualizar estados)
 end ControladorBrazo;
 
 architecture Behavioral of ControladorBrazo is
@@ -33,7 +33,7 @@ architecture Behavioral of ControladorBrazo is
 	signal nextMotor : integer range 1 to 6 := 1;
 
    --Velocidad de reproduccion de rutinas (tiempo de espera entre cada posicion)
-   constant delay : integer := 10; 						  -- (clk_20Hz pulses) <= delay(s)*20
+   constant delay : integer := 4; 						  -- (clk_20Hz pulses) <= delay(s)*20
    signal contDelay : integer range 0 to delay := 0; -- (clk_20Hz pulses)
 
    --Componente para generar senales PWM para cada motor
