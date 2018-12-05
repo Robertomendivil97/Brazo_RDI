@@ -1,0 +1,21 @@
+#Salidas de la terminal A2 de la tarjeta Spartan
+NET "state_arm(0)" LOC = "B5";
+NET "state_arm(1)" LOC = "B6";
+NET "state_claw(0)" LOC = "A7";
+NET "state_claw(1)" LOC = "A8";
+NET "state_rotate(0)" LOC = "B10";
+NET "state_rotate(1)" LOC = "B11";
+NET "state_rotate(2)" LOC = "A12";
+NET "H" LOC = "R9";
+NET "V" LOC = "T10";
+NET "B" LOC = "R11";
+NET "G" LOC = "T12";
+NET "R" LOC = "R12";
+NET "STATE_M(0)" LOC = "C6";
+NET "STATE_M(1)" LOC = "C7";
+NET "STATE_M(2)" LOC = "C8";
+NET "state_mod(0)"LOC ="b13";
+NET "state_mod(1)"LOC ="B12";
+
+#Clock interno de la tarjeta Spartan
+NET "clk_50MHz" LOC = "T9";
